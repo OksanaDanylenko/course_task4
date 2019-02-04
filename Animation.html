@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Animation</title>
+</head>
+<body>
+<canvas id="canvas" style="background:#000; float: left; "></canvas>
+<div id="area_circle" style="float: left; margin-left: 100px; "></div>
+<div id="area_square" style="float: right; margin-right: 100px;"></div>
+<script type="text/javascript">
+    'use strict';
+    let canvas = document.getElementById('canvas');
+    let context = canvas.getContext('2d');
+    let circleArray = [],
+        squareArray = [],
+        NumOfFigures = 10;
+
+    canvas.width = 800;
+    canvas.height = 600;
+
+    let divCircle = document.getElementById('area_circle');
+    divCircle.innerText+='Area of circles\n';
+    let divSquare = document.getElementById('area_square');
+    divSquare.innerText +='Square area:\n';
+
+    let selectColor = () => {
+        let values = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++)
+            color += values[Math.floor(Math.random() * 16)];
+        return color;
+    };
+
+    function Circle(x,y,dx,dy,radius){
+        this.x = x;
+        this.y = y;
+        this.dx = dx;
+        this.dy = dy;
+        this.color = selectColor();
+        this.radius = radius;
+        this.area = (Math.PI * Math.pow(this.radius,2)).toFixed();
+        let rand1 = Math.random();
+
+        this.update = function(){
+            this.x += this.dx;
+            this.y += this.dy;
+
+            if(this.dx + this.x + this.radius > canvas.width ||this.dx + this.x - this.radius  < 0 ){
+                this.dx =  -this.dx + rand1 ;
+            }
+
+            if(this.y +this.dy + this.radius > canvas.height ||this.y + this.dx - this.radius  < 0  ){
+                this.dy = -this.dy + rand1 ;
+            }
+
+            this.draw();
+        };
+
+        this.draw = function(){
+            context.beginPath();
+            context.arc(this.x, this.y, this.radius, Math.PI*2, false);
+            context.fillStyle = this.color;
+            context.fill();
+            context.closePath();
+        }
+
+    }
+
+    function Square(x,y,dx,dy,side){
+        this.x = x;
+        this.y = y;
+        this.side = side;
+        this.dx = dx;
+        this.dy = dy;
+        this.color = selectColor();
+        this.area = (Math.pow(this.side,2)).toFixed();
+        let rand1 = Math.random();
+
+        this.update = function(){
+            this.x += this.dx;
+            this.y += this.dy;
+
+            if (this.x + this.dx + this.side  > canvas.width|| this.x + this.dx < 0) {
+                this.dx = -this.dx + rand1;
+            }
+            if (this.y + this.dy + this.side > canvas.height || this.y + this.dx < 0) {
+                this.dy = -this.dy +rand1;
+            }
+
+            this.draw();
+        };
+
+        this.draw = function(){
+            context.beginPath();
+            context.rect(this.x, this.y, this.side, this.side);
+            context.fillStyle = this.color;
+            context.fill();
+            context.closePath();
+        }
+
+    }
+
+    let countCircle = 0,
+        countSquare = 0;
+    let figureTimer = setInterval(() => {
+        let dx = 1;
+        let dy = 2;
+
+        if (countCircle<NumOfFigures){
+            let radius = (Math.random() * 35)+20;
+            let x = radius;
+            let y = radius;
+            circleArray.push(new Circle(x,y,dx,dy,radius));
+            divCircle.innerText+=(countCircle+1)+ ') ' +circleArray[countCircle].area+' px\n';
+            countCircle++;
+        }
+        else if (countSquare<NumOfFigures){
+            let side = (Math.random() * 35)+20;
+            let x = 0;
+            let y = 0;
+            squareArray.push(new Square(x,y,dx,dy,side));
+            divSquare.innerText+=(countSquare+1)+ ') '+ squareArray[countSquare].area+' px\n';
+            countSquare++;
+        }
+        else clearInterval(figureTimer);
+    }, 5000);
+
+
+    setInterval( () => {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < countCircle; i++)
+            circleArray[i].update();
+        for (let i = 0; i < countSquare; i++)
+            squareArray[i].update();
+    },15);
+</script>
+</body>
+</html>
